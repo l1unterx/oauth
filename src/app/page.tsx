@@ -1,10 +1,14 @@
 "use client";
 
 import GoogleLoginButton from "@/components/GoogleLoginButton";
+import GithubLoginButton from "@/components/GithubLoginButton";
+
+
+
+
 export default function Home() {
   return (
     <main className="min-h-screen bg-black flex items-center justify-center px-4">
-      {/* Google Font */}
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Serif+Display:ital@0;1&display=swap');
         body { font-family: 'DM Sans', sans-serif; }
@@ -40,9 +44,12 @@ export default function Home() {
           <div className="flex-1 h-px bg-white/[0.06]" />
         </div>
 
-        {/* Google Button */}
-       <GoogleLoginButton />
-        
+        {/* Login Buttons */}
+        <div className="flex flex-col gap-3 mb-8">
+          <GoogleLoginButton />
+          <GithubLoginButton />
+        </div>
+
         {/* Footer */}
         <p className="text-center text-xs text-white/20">
           No account?{" "}
