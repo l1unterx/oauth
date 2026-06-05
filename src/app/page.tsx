@@ -21,7 +21,7 @@ export default function Home() {
         {/* Brand */}
         <div className="flex items-center gap-2.5 mb-9">
           <img src="https://spara.ir/favicon.ico" alt="Logo" className="w-6 h-6 rounded-sm object-contain" />
-          <span className="font-serif-display text-white text-lg tracking-tight">Acme</span>
+          <span className="font-serif-display text-white text-lg tracking-tight">Spara Oauth Challange</span>
         </div>
 
         {/* Headline */}
