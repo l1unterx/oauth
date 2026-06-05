@@ -3,9 +3,6 @@
 import GoogleLoginButton from "@/components/GoogleLoginButton";
 import GithubLoginButton from "@/components/GithubLoginButton";
 
-
-
-
 export default function Home() {
   return (
     <main className="min-h-screen bg-black flex items-center justify-center px-4">
