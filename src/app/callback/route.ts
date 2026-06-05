@@ -21,11 +21,11 @@ export async function GET(request: Request) {
   const cookieState = getCookieValue(request.headers.get("cookie"), "oauth_state");
 
   if (!code) {
-    return NextResponse.redirect(new URL("/?error=missing_code", url.origin), 302);
+    return NextResponse.redirect(new URL("/error?msg=missing_code", url.origin), 302);
   }
 
   if (!state || state !== cookieState) {
-    return NextResponse.redirect(new URL("/?error=invalid_state", url.origin), 302);
+    return NextResponse.redirect(new URL("/error?msg=invalid_state", url.origin), 302);
   }
 
   
@@ -36,7 +36,7 @@ export async function GET(request: Request) {
   const redirectUri = new URL("/callback", url.origin).toString();
 
   if (!clientSecret) {
-    return NextResponse.redirect(new URL("/?error=missing_client_secret", url.origin), 302);
+    return NextResponse.redirect(new URL("/error?msg=missing_client_secret", url.origin), 302);
   }
 
   const tokenResponse = await fetch(GOOGLE_TOKEN_URL, {
@@ -54,14 +54,14 @@ export async function GET(request: Request) {
   });
 
   if (!tokenResponse.ok) {
-    return NextResponse.redirect(new URL("/?error=token_exchange_failed", url.origin), 302);
+    return NextResponse.redirect(new URL("/error?msg=token_exchange_failed", url.origin), 302);
   }
 
   const tokenData = await tokenResponse.json();
   const accessToken = tokenData.access_token;
 
   if (!accessToken) {
-    return NextResponse.redirect(new URL("/?error=no_access_token", url.origin), 302);
+    return NextResponse.redirect(new URL("/error?msg=no_access_token", url.origin), 302);
   }
 
   const profileResponse = await fetch(GOOGLE_USERINFO_URL, {
@@ -71,7 +71,7 @@ export async function GET(request: Request) {
   });
 
   if (!profileResponse.ok) {
-    return NextResponse.redirect(new URL("/?error=userinfo_failed", url.origin), 302);
+    return NextResponse.redirect(new URL("/error?msg=userinfo_failed", url.origin), 302);
   }
 
   const profileData = await profileResponse.json();
