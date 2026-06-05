@@ -3,13 +3,32 @@ import { NextResponse } from "next/server";
 const GOOGLE_TOKEN_URL = "https://oauth2.googleapis.com/token";
 const GOOGLE_USERINFO_URL = "https://openidconnect.googleapis.com/v1/userinfo";
 
+function getCookieValue(cookieHeader: string | null, name: string) {
+  if (!cookieHeader) return null;
+
+  const cookie = cookieHeader
+    .split(";")
+    .map((entry) => entry.trim())
+    .find((entry) => entry.startsWith(`${name}=`));
+
+  return cookie ? decodeURIComponent(cookie.split("=").slice(1).join("=")) : null;
+}
+
 export async function GET(request: Request) {
   const url = new URL(request.url);
   const code = url.searchParams.get("code");
+  const state = url.searchParams.get("state");
+  const cookieState = getCookieValue(request.headers.get("cookie"), "oauth_state");
 
   if (!code) {
-    return NextResponse.redirect(new URL("/?error=missing_code", url.origin));
+    return NextResponse.redirect(new URL("/?error=missing_code", url.origin), 302);
   }
+
+  if (!state || state !== cookieState) {
+    return NextResponse.redirect(new URL("/?error=invalid_state", url.origin), 302);
+  }
+
+  
 
   const clientId = process.env.GOOGLE_CLIENT_ID ??
     "1083511301870-50a5kd0qe6to82nc78lbs35vqnu4tmr4.apps.googleusercontent.com";
@@ -17,7 +36,7 @@ export async function GET(request: Request) {
   const redirectUri = new URL("/callback", url.origin).toString();
 
   if (!clientSecret) {
-    return NextResponse.redirect(new URL("/?error=missing_client_secret", url.origin));
+    return NextResponse.redirect(new URL("/?error=missing_client_secret", url.origin), 302);
   }
 
   const tokenResponse = await fetch(GOOGLE_TOKEN_URL, {
@@ -35,14 +54,14 @@ export async function GET(request: Request) {
   });
 
   if (!tokenResponse.ok) {
-    return NextResponse.redirect(new URL("/?error=token_exchange_failed", url.origin));
+    return NextResponse.redirect(new URL("/?error=token_exchange_failed", url.origin), 302);
   }
 
   const tokenData = await tokenResponse.json();
   const accessToken = tokenData.access_token;
 
   if (!accessToken) {
-    return NextResponse.redirect(new URL("/?error=no_access_token", url.origin));
+    return NextResponse.redirect(new URL("/?error=no_access_token", url.origin), 302);
   }
 
   const profileResponse = await fetch(GOOGLE_USERINFO_URL, {
@@ -52,20 +71,25 @@ export async function GET(request: Request) {
   });
 
   if (!profileResponse.ok) {
-    return NextResponse.redirect(new URL("/?error=userinfo_failed", url.origin));
+    return NextResponse.redirect(new URL("/?error=userinfo_failed", url.origin), 302);
   }
 
   const profileData = await profileResponse.json();
   const { name, email, picture } = profileData;
   const profileValue = Buffer.from(JSON.stringify({ name, email, picture }), "utf-8").toString("base64");
 
-  const response = NextResponse.redirect(new URL("/profile", url.origin));
- 
+  const response = NextResponse.redirect(new URL("/profile", url.origin), 302);
+
   response.cookies.set("google_profile", profileValue, {
     path: "/",
     httpOnly: true,
     sameSite: "lax",
     maxAge: 60 * 60,
+  });
+
+  response.cookies.set("oauth_state", "", {
+    path: "/",
+    maxAge: 0,
   });
 
   return response;

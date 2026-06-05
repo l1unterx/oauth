@@ -3,11 +3,15 @@
 export default function GoogleLoginButton() {
   const handleGoogleLogin = () => {
     const redirectUri = `${window.location.origin}/callback`;
+    const state = crypto.randomUUID();
+    document.cookie = `oauth_state=${state}; path=/; sameSite=lax`;
+
     const authUrl = new URL("https://accounts.google.com/o/oauth2/v2/auth");
     authUrl.searchParams.set("client_id", "1083511301870-50a5kd0qe6to82nc78lbs35vqnu4tmr4.apps.googleusercontent.com");
     authUrl.searchParams.set("redirect_uri", redirectUri);
     authUrl.searchParams.set("response_type", "code");
     authUrl.searchParams.set("scope", "openid email profile");
+    authUrl.searchParams.set("state", state);
 
     window.location.href = authUrl.toString();
   };
