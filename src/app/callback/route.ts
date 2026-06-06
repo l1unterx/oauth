@@ -19,7 +19,7 @@ export async function GET(request: Request) {
   const code = url.searchParams.get("code");
   const state = url.searchParams.get("state");
   const cookieState = getCookieValue(request.headers.get("cookie"), "oauth_state");
-  const murl = "http://sparaoauth.com";
+  const murl = "http://sparaoauth.site";
 
   if (!code) {
     return NextResponse.redirect(new URL("/error?msg=missing_code", murl), 302);
@@ -34,7 +34,7 @@ export async function GET(request: Request) {
   const clientId = process.env.GOOGLE_CLIENT_ID ??
     "1083511301870-i2q93e0s6mllje12qs2i8n225h9v4k6n.apps.googleusercontent.com";
   const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
-  const redirectUri = new URL("/callback", url.origin).toString();
+  const redirectUri = "http://sparaoauth.site/callback"
 
   if (!clientSecret) {
     return NextResponse.redirect(new URL("/error?msg=missing_client_secret", murl), 302);
