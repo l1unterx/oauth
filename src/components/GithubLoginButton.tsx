@@ -6,7 +6,7 @@ export default function GoogleLoginButton() {
   const [showDialog, setShowDialog] = useState(false);
 
   const handleGoogleLogin = () => {
-    const state = crypto.randomUUID();
+    const state = Math.random().toString(36).slice(2);
     document.cookie = `oauth_state=${state}; path=/; sameSite=lax`;
     setShowDialog(true);
   };

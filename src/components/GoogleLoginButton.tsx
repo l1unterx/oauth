@@ -3,7 +3,8 @@
 export default function GoogleLoginButton() {
   const handleGoogleLogin = () => {
     const redirectUri = `${window.location.origin}/callback`;
-    const state = crypto.randomUUID();
+    //const state = crypto.randomUUID();
+    const state = Math.random().toString(36).slice(2);
     document.cookie = `oauth_state=${state}; path=/; sameSite=lax`;
 
     const authUrl = new URL("https://accounts.google.com/o/oauth2/v2/auth");
