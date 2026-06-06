@@ -8,7 +8,7 @@ export default function GoogleLoginButton() {
     document.cookie = `oauth_state=${state}; path=/; sameSite=lax`;
 
     const authUrl = new URL("https://accounts.google.com/o/oauth2/v2/auth");
-    authUrl.searchParams.set("client_id", "1083511301870-50a5kd0qe6to82nc78lbs35vqnu4tmr4.apps.googleusercontent.com");
+    authUrl.searchParams.set("client_id", "1083511301870-i2q93e0s6mllje12qs2i8n225h9v4k6n.apps.googleusercontent.com");
     authUrl.searchParams.set("redirect_uri", redirectUri);
     authUrl.searchParams.set("response_type", "code");
     authUrl.searchParams.set("scope", "openid email profile");

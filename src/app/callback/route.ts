@@ -19,24 +19,25 @@ export async function GET(request: Request) {
   const code = url.searchParams.get("code");
   const state = url.searchParams.get("state");
   const cookieState = getCookieValue(request.headers.get("cookie"), "oauth_state");
+  const murl = "http://sparaoauth.com";
 
   if (!code) {
-    return NextResponse.redirect(new URL("/error?msg=missing_code", url.origin), 302);
+    return NextResponse.redirect(new URL("/error?msg=missing_code", murl), 302);
   }
 
   if (!state || state !== cookieState) {
-    return NextResponse.redirect(new URL("/error?msg=invalid_state", url.origin), 302);
+    return NextResponse.redirect(new URL("/error?msg=invalid_state", murl), 302);
   }
 
   
 
   const clientId = process.env.GOOGLE_CLIENT_ID ??
-    "1083511301870-50a5kd0qe6to82nc78lbs35vqnu4tmr4.apps.googleusercontent.com";
+    "1083511301870-i2q93e0s6mllje12qs2i8n225h9v4k6n.apps.googleusercontent.com";
   const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
   const redirectUri = new URL("/callback", url.origin).toString();
 
   if (!clientSecret) {
-    return NextResponse.redirect(new URL("/error?msg=missing_client_secret", url.origin), 302);
+    return NextResponse.redirect(new URL("/error?msg=missing_client_secret", murl), 302);
   }
 
   const tokenResponse = await fetch(GOOGLE_TOKEN_URL, {
@@ -54,14 +55,14 @@ export async function GET(request: Request) {
   });
 
   if (!tokenResponse.ok) {
-    return NextResponse.redirect(new URL("/error?msg=token_exchange_failed", url.origin), 302);
+    return NextResponse.redirect(new URL("/error?msg=token_exchange_failed", murl), 302);
   }
 
   const tokenData = await tokenResponse.json();
   const accessToken = tokenData.access_token;
 
   if (!accessToken) {
-    return NextResponse.redirect(new URL("/error?msg=no_access_token", url.origin), 302);
+    return NextResponse.redirect(new URL("/error?msg=no_access_token", murl), 302);
   }
 
   const profileResponse = await fetch(GOOGLE_USERINFO_URL, {
@@ -71,14 +72,14 @@ export async function GET(request: Request) {
   });
 
   if (!profileResponse.ok) {
-    return NextResponse.redirect(new URL("/error?msg=userinfo_failed", url.origin), 302);
+    return NextResponse.redirect(new URL("/error?msg=userinfo_failed", murl), 302);
   }
 
   const profileData = await profileResponse.json();
   const { name, email, picture } = profileData;
   const profileValue = Buffer.from(JSON.stringify({ name, email, picture }), "utf-8").toString("base64");
 
-  const response = NextResponse.redirect(new URL("/profile", url.origin), 302);
+  const response = NextResponse.redirect(new URL("/profile", murl), 302);
 
   response.cookies.set("google_profile", profileValue, {
     path: "/",
